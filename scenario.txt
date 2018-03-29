@@ -1,0 +1,22 @@
+scene: AwalMula
+image: plane
+Jaman   dahulu
+cccccc scjaslkfj lkwe flwkef
+abcd lskdslkd
+image: wood
+sdnflsdfjds lew flwe
+eksw fwekj lwej fwelfk
+choices:
+ambil anak itu dan dimasak: Jahat
+Buang: KurangJahat
+
+scene: Jahat
+image: plane
+sdjfgsdkfgdskf
+gameover
+
+scene : KurangJahat
+image: plane
+sajhfgksdf
+sdkfjhskdjfh
+sdfksjdf
