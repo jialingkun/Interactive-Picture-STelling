@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayStory : MonoBehaviour {
 	//scenario
@@ -12,6 +13,16 @@ public class PlayStory : MonoBehaviour {
 	private Dictionary<string, Sprite> illustration = new Dictionary<string, Sprite>();
 	//other
 	private string firstScene;
+	private int currentCommandIndex;
+	private string currentScene;
+	private string[] tempLine;
+	//animate
+	private bool typingAnimation;
+	public float textSpeed = 0.03f;
+
+
+	//Gameobject;
+	private Text dialogText;
 
 	// Use this for initialization
 	void Start () {
@@ -21,7 +32,6 @@ public class PlayStory : MonoBehaviour {
 		firstScene = scenarioArray [0].Split (":" [0]) [1].Trim();
 
 		//scenario to Dictionary
-		string[] tempLine;
 		string tempSceneKey = firstScene;
 		bool choiceOpen = false;
 		foreach (string line in scenarioArray) {
@@ -62,10 +72,56 @@ public class PlayStory : MonoBehaviour {
 		foreach (Sprite sprite in spriteIllustration) {
 			illustration.Add (sprite.name, sprite);
 		}
+
+
+
+		//temp initialize
+		currentCommandIndex = 0;
+		currentScene = firstScene;
+
+		//gameobject initialize
+		dialogText = GameObject.Find("DialogText").GetComponent<Text>();
+
+		//start dialog
+		clickDialog();
+	}
+
+	IEnumerator AnimateText(string text){
+		typingAnimation = true;
+		for (int i = 0; i < (text.Length+1); i++)
+		{
+			dialogText.text = text.Substring(0, i);
+			yield return new WaitForSeconds(textSpeed);
+		}
+		typingAnimation = false;
+	}
+
+	public void SkipAnimateText(){
+		StopAllCoroutines();
+		dialogText.text = tempLine[0];
+		typingAnimation = false;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
+	public void clickDialog(){
+		if (typingAnimation) {
+			SkipAnimateText ();
+		} else {
+			tempLine = scene [currentScene].commands [currentCommandIndex].Split(":"[0]);
+			if (tempLine.Length > 1) {
+				if (tempLine [0].Trim () == "choices") {
+					currentCommandIndex--;
+				} else { //not command but contain :
+					StartCoroutine(AnimateText(tempLine[0]));
+				}
+			} else if(tempLine [0].Trim () == "gameover") { //gameover
+				dialogText.text = "GAMEOVER";
+			} else { //dialog
+				StartCoroutine(AnimateText(tempLine[0]));
+			}
+			currentCommandIndex++;
+		}
+
+
+
 	}
 }
