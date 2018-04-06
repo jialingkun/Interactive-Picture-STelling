@@ -1,14 +1,18 @@
 scene: AwalMula
 image: plane
-Jaman   dahulu
-cccccc scjaslkfj lkwe flwkef
-abcd lskdslkd
+Pada jaman dahulu kala di kerajaan indomie, hiduplah timun yang berbuah manusia. Seorang nenek menemukan timun dan bermaksud memasaknya, namun muncul anak bayi yang kelihatan enak.
+Alo’s Secret
+Alo mempunyai rahasianya sendiri di kalangan para kelinci. Tidak ada yang mengetahui rahasia Alo si kelinci baik itu teman-teman kelincinya, para musang ataupun para tupai. Saat dia memikirkan mengenai rahasianya ia tersenyum – senyum sendiri.
+The bunny: Hey lihat, Alo teman kita sudah mulai gila rupanya
+Squirel: Hahaha, dasar kelinci gila, kerjaannya hanya tersenyum2 saja.
 image: wood
-sdnflsdfjds lew flwe
+Pada jaman dahulu kala di kerajaan indomie, hiduplah timun yang berbuah manusia. Seorang nenek menemukan timun dan bermaksud memasaknya, namun muncul anak bayi yang kelihatan enak.
+cccccc scjaslkfj lkwe flwkef
 eksw fwekj lwej fwelfk
 choices:
 ambil anak itu dan dimasak: Jahat
 Buang: KurangJahat
+Buang ke panti: KurangJahat
 
 scene: Jahat
 image: plane
@@ -20,3 +24,8 @@ image: plane
 sajhfgksdf
 sdkfjhskdjfh
 sdfksjdf
+
+scene: Tamat
+image: plane
+sdjfgsdkfgdskf
+gameover
