@@ -1,31 +1,59 @@
 scene: AwalMula
 image: plane
+Timun Emas
 Pada jaman dahulu kala di kerajaan indomie, hiduplah timun yang berbuah manusia. Seorang nenek menemukan timun dan bermaksud memasaknya, namun muncul anak bayi yang kelihatan enak.
-Alo’s Secret
-Alo mempunyai rahasianya sendiri di kalangan para kelinci. Tidak ada yang mengetahui rahasia Alo si kelinci baik itu teman-teman kelincinya, para musang ataupun para tupai. Saat dia memikirkan mengenai rahasianya ia tersenyum – senyum sendiri.
-The bunny: Hey lihat, Alo teman kita sudah mulai gila rupanya
-Squirel: Hahaha, dasar kelinci gila, kerjaannya hanya tersenyum2 saja.
+Karena anak bayi tu sangat lucu dan lezat, nenek bingung dan meletakkannya di bawah pohon.
 image: wood
-Pada jaman dahulu kala di kerajaan indomie, hiduplah timun yang berbuah manusia. Seorang nenek menemukan timun dan bermaksud memasaknya, namun muncul anak bayi yang kelihatan enak.
-cccccc scjaslkfj lkwe flwkef
-eksw fwekj lwej fwelfk
+"Apa yang harus kulakukan pada anak ini?" gumam nenek kebingungan.
 choices:
 ambil anak itu dan dimasak: Jahat
-Buang: KurangJahat
 Buang ke panti: KurangJahat
 
 scene: Jahat
+Nenek itu pun membawa anak itu ke dapur dan mulai bersiap memasaknya.
+Sebelum nenek itu sempat memasukan si bayi ke dalam panci penggorengan, FBI datang dan menangkap nenek itu.
 image: plane
-sdjfgsdkfgdskf
+Sang nenek akhirnya masuk penjara dengan vonis percobaan kanibalisme.
+TAMAT
+BAD ENDING - NENEK DIPENJARA
 gameover
 
 scene : KurangJahat
-image: plane
-sajhfgksdf
-sdkfjhskdjfh
-sdfksjdf
+"Aku akan membawanya ke panti" gumam nenek itu.
+get : GaTega
+Tapi panti yang mana?
+choices:
+Panti Jompo: SalahPanti
+Panti Asuhan: Asuhan
+Panti Pijat : SalahPanti
+Panti Sosial : SalahPanti
+Panti Penitipan Suami: SalahPanti
 
-scene: Tamat
+scene : SalahPanti
+Nenek itu tiba di panti. Namun pemilik panti berkata kalau dia salah panti.
+Pemilik panti itu bilang kalau anak kecil dibawa ke panti asuhan.
+get: nenekPintar
+Akhirnya nenek itu membawa si bayi ke panti asuhan.
+jump: Asuhan
+
+scene : Asuhan
 image: plane
-sdjfgsdkfgdskf
+Nenek tiba di panti asuhan.
+Dia pun mulai menyerahkan bayi itu ke panti asuhan.
+req: nenekPintar,GaTega: TamatBagus : TamatBiasa
+
+scene: TamatBiasa
+Akhirnya bayi itu dibawa oleh panti asuhan dan dimasak.
+TAMAT
+BAD ENDING - DIBAWA PANTI ASUHAN
+gameover
+
+scene: TamatBagus
+image: wood
+Saat nenek hendak memberikan bayi itu, bayi itu berteriak, "JANGAN NEK! AKU INGIN SAMA NENEK!"
+Sang nenek kaget. "BAYI BISA BICARA?"
+"Aku pingin ngejaga nenek. Aku ga tega biarin nenek goblok yang mau buang bayi aja salah panti."
+Sang nenek terharu dan memutuskan untuk merawat bayi itu.
+TAMAT
+GOOD ENDING - BAYI DIRAWAT NENEK
 gameover

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayStory : MonoBehaviour {
 	//scenario
@@ -16,10 +17,12 @@ public class PlayStory : MonoBehaviour {
 	private int currentCommandIndex;
 	private string currentScene;
 	private string[] tempLine;
+	private List<string> inventory;
 	//animate
 	private bool typingAnimation;
 	public float textSpeed = 0.03f;
 	public float transitionDelay = 1.1f;
+	public float gameoverDelay = 1.5f;
 
 
 	//other Gameobject;
@@ -30,6 +33,7 @@ public class PlayStory : MonoBehaviour {
 	private string[] choiceDestination;
 	private Text[] choiceText;
 	private int currentChoicesCount;
+	private int maxChoices;
 
 	// Use this for initialization
 	void Start () {
@@ -85,6 +89,7 @@ public class PlayStory : MonoBehaviour {
 		//temp initialize
 		currentCommandIndex = -1; //-1 because currentCommandIndex++ run first
 		currentScene = firstScene;
+		inventory = new List<string>();
 
 
 		//gameobject initialize
@@ -93,7 +98,7 @@ public class PlayStory : MonoBehaviour {
 		fadePanel = GameObject.Find("FadePanel").GetComponent<Image>();
 
 		//choice initialize
-		int maxChoices = 6;
+		maxChoices = 6;
 		choiceDestination = new string[maxChoices];
 		choiceText = new Text[maxChoices];
 		for (int i = 0; i < maxChoices; i++) {
@@ -123,12 +128,22 @@ public class PlayStory : MonoBehaviour {
 	}
 
 	IEnumerator IllustrationTransition(Sprite sprite){
+		dialogText.transform.parent.gameObject.SetActive (false);
 		fadePanel.CrossFadeAlpha(1.0f, 0.7f, false); //(alpha value, fade speed, not important)
 		yield return new WaitForSeconds(transitionDelay);
 		illustrationImage.sprite = sprite;
 		fadePanel.CrossFadeAlpha(0.0f, 0.7f, false);
 		yield return new WaitForSeconds(1.0f);
+		dialogText.transform.parent.gameObject.SetActive (true);
 		clickDialog ();
+	}
+
+	IEnumerator gameoverTransition(){
+		dialogText.transform.parent.gameObject.SetActive (false);
+		yield return new WaitForSeconds(gameoverDelay);
+		fadePanel.CrossFadeAlpha(1.0f, 2.0f, false); //(alpha value, fade speed, not important)
+		yield return new WaitForSeconds(2.5f);
+		SceneManager.LoadScene (0);
 	}
 	
 	public void clickDialog(){
@@ -148,23 +163,54 @@ public class PlayStory : MonoBehaviour {
 						}
 					} else if (currentChoicesCount == 2) {
 						//center top
-						choiceDestination [1] = scene [currentScene].choices [1].destination;
-						choiceText [1].text = scene [currentScene].choices [1].text;
+						choiceDestination [1] = scene [currentScene].choices [0].destination;
+						choiceText [1].text = scene [currentScene].choices [0].text;
 						choiceText [1].transform.parent.gameObject.SetActive (true);
 						//center bottom
-						choiceDestination [4] = scene [currentScene].choices [4].destination;
-						choiceText [4].text = scene [currentScene].choices [4].text;
+						choiceDestination [4] = scene [currentScene].choices [1].destination;
+						choiceText [4].text = scene [currentScene].choices [1].text;
 						choiceText [4].transform.parent.gameObject.SetActive (true);
 					}
 					dialogText.transform.parent.gameObject.SetActive (false);
 				} else if (tempLine [0].Trim () == "image") {
 					StartCoroutine(IllustrationTransition(illustration [tempLine [1].Trim ()]));
+				} else if (tempLine [0].Trim () == "jump") {
+					currentCommandIndex = -1;
+					currentScene = tempLine [1].Trim ();
+					clickDialog ();
+				} else if (tempLine [0].Trim () == "get") {
+					inventory.Add (tempLine [1].Trim ());
+					clickDialog ();
+				} else if (tempLine [0].Trim () == "req") {
+					string[] tempReq = tempLine [1].Split ("," [0]);
+					bool pass = true;
+					bool reqExist;
+					for (int i = 0; i < tempReq.Length; i++) {
+						reqExist = false;
+						for (int j = 0; j < inventory.Count; j++) {
+							if (tempReq[i].Trim() == inventory[j]) {
+								reqExist = true;
+							}
+						}
+						if (!reqExist) {
+							pass = false;
+						}
+					}
+					if (pass) {
+						currentCommandIndex = -1;
+						currentScene = tempLine [2].Trim ();
+						clickDialog ();
+					} else {
+						currentCommandIndex = -1;
+						currentScene = tempLine [3].Trim ();
+						clickDialog ();
+					}
 				} else { //not command but contain :
 					tempLine[0] = scene [currentScene].commands [currentCommandIndex]; //unsplit
 					StartCoroutine(AnimateText(tempLine[0]));
 				}
 			} else if(tempLine [0].Trim () == "gameover") { //gameover
-				dialogText.text = "GAMEOVER";
+				StartCoroutine(gameoverTransition());
 			} else { //dialog
 				StartCoroutine(AnimateText(tempLine[0]));
 			}
@@ -174,5 +220,13 @@ public class PlayStory : MonoBehaviour {
 	}
 
 	public void clickChoice(int destinationIndex){
+		currentCommandIndex = -1;
+		currentScene = choiceDestination [destinationIndex];
+		for (int i = 0; i < maxChoices; i++) {
+			choiceText [i].transform.parent.gameObject.SetActive (false);
+		}
+		dialogText.transform.parent.gameObject.SetActive (true);
+
+		clickDialog ();
 	}
 }
