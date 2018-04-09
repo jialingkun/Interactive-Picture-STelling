@@ -1,59 +1,68 @@
-scene: AwalMula
+scene: Prolog
 image: plane
+bgm: japanese
 Timun Emas
 Pada jaman dahulu kala di kerajaan indomie, hiduplah timun yang berbuah manusia. Seorang nenek menemukan timun dan bermaksud memasaknya, namun muncul anak bayi yang kelihatan enak.
 Karena anak bayi tu sangat lucu dan lezat, nenek bingung dan meletakkannya di bawah pohon.
 image: wood
 "Apa yang harus kulakukan pada anak ini?" gumam nenek kebingungan.
 choices:
-ambil anak itu dan dimasak: Jahat
-Buang ke panti: KurangJahat
+ambil anak itu dan dimasak: Mau Dimasak
+Buang ke panti: Mau dibawa panti
 
-scene: Jahat
+scene: Mau Dimasak
+bgm: pambiental
 Nenek itu pun membawa anak itu ke dapur dan mulai bersiap memasaknya.
-Sebelum nenek itu sempat memasukan si bayi ke dalam panci penggorengan, FBI datang dan menangkap nenek itu.
+Sebelum nenek itu sempat memasukan si bayi ke dalam panci penggorengan, FBI datang dan mencoba menangkap nenek itu.
+Nenek itu berusaha kabur dengan cara melompat keluar jendela.
+se: deathexplode
+DOR!
+Kaki nenek di tembak. Dia kemudian diringkus FBI. 
 image: plane
 Sang nenek akhirnya masuk penjara dengan vonis percobaan kanibalisme.
 TAMAT
-BAD ENDING - NENEK DIPENJARA
+AKHIR YANG BURUK - NENEK DIPENJARA
 gameover
 
-scene : KurangJahat
+scene : Mau dibawa panti
+bgm: none
 "Aku akan membawanya ke panti" gumam nenek itu.
 get : GaTega
 Tapi panti yang mana?
 choices:
-Panti Jompo: SalahPanti
-Panti Asuhan: Asuhan
-Panti Pijat : SalahPanti
-Panti Sosial : SalahPanti
-Panti Penitipan Suami: SalahPanti
+Panti Jompo: Salah Panti
+Panti Asuhan: Panti Asuhan
+Panti Pijat : Salah Panti
+Panti Sosial : Salah Panti
+Panti Penitipan Suami: Salah Panti
 
-scene : SalahPanti
+scene : Salah Panti
 Nenek itu tiba di panti. Namun pemilik panti berkata kalau dia salah panti.
 Pemilik panti itu bilang kalau anak kecil dibawa ke panti asuhan.
+se: powerup
 get: nenekPintar
 Akhirnya nenek itu membawa si bayi ke panti asuhan.
-jump: Asuhan
+jump: Panti Asuhan
 
-scene : Asuhan
+scene : Panti Asuhan
 image: plane
+bgm: japanese
 Nenek tiba di panti asuhan.
 Dia pun mulai menyerahkan bayi itu ke panti asuhan.
-req: nenekPintar,GaTega: TamatBagus : TamatBiasa
+req: nenekPintar,GaTega: Tamat Bagus : Dimasak Panti asuhan
 
-scene: TamatBiasa
+scene: Dimasak Panti asuhan
 Akhirnya bayi itu dibawa oleh panti asuhan dan dimasak.
 TAMAT
-BAD ENDING - DIBAWA PANTI ASUHAN
+AKHIR YANG BURUK - DIMASAK PANTI ASUHAN
 gameover
 
-scene: TamatBagus
+scene: Tamat Bagus
 image: wood
 Saat nenek hendak memberikan bayi itu, bayi itu berteriak, "JANGAN NEK! AKU INGIN SAMA NENEK!"
 Sang nenek kaget. "BAYI BISA BICARA?"
 "Aku pingin ngejaga nenek. Aku ga tega biarin nenek goblok yang mau buang bayi aja salah panti."
 Sang nenek terharu dan memutuskan untuk merawat bayi itu.
 TAMAT
-GOOD ENDING - BAYI DIRAWAT NENEK
+AKHIR YANG BAIK - BAYI DIRAWAT NENEK
 gameover

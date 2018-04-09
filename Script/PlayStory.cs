@@ -5,13 +5,18 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlayStory : MonoBehaviour {
+	//resource
+	private Resources resources;
 	//scenario
-	public TextAsset scenario;
-	private string[] scenarioArray;
 	private Dictionary<string, StoryScene> scene = new Dictionary<string, StoryScene>();
 	//illustration
-	public List<Sprite> spriteIllustration;
 	private Dictionary<string, Sprite> illustration = new Dictionary<string, Sprite>();
+	//Audio
+	private Dictionary<string, AudioClip> BGM = new Dictionary<string, AudioClip>();
+	private Dictionary<string, AudioClip> SE = new Dictionary<string, AudioClip>();
+	private AudioSource BGMaudioSource;
+	private AudioSource SEaudioSource;
+	private string currentBGM;
 	//other
 	private string firstScene;
 	private int currentCommandIndex;
@@ -29,6 +34,16 @@ public class PlayStory : MonoBehaviour {
 	private Text dialogText;
 	private Image illustrationImage;
 	private Image fadePanel;
+	//menu
+	private GameObject menu;
+	private GameObject confirmExit;
+	//save load
+	private GameObject saveLoad;
+	private GameObject confirmSaveLoad;
+	private bool isSave;
+	private GameObject[] slot;
+	private int maxSlots;
+	private int currentSlot;
 	//choice
 	private string[] choiceDestination;
 	private Text[] choiceText;
@@ -37,58 +52,26 @@ public class PlayStory : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
-		//scenario
-		scenarioArray = scenario.text.Split("\n"[0]);
-		firstScene = scenarioArray [0].Split (":" [0]) [1].Trim();
-
-		//scenario to Dictionary
-		string tempSceneKey = firstScene;
-		bool choiceOpen = false;
-		foreach (string line in scenarioArray) {
-			tempLine = line.Split(":"[0]);
-			if (tempLine.Length > 1) { //Command
-				if (tempLine [0].Trim () == "scene") {
-					tempSceneKey = tempLine [1].Trim ();
-					scene.Add (tempSceneKey, new StoryScene ());
-					choiceOpen = false;
-				} else if (tempLine [0].Trim () == "choices") {
-					choiceOpen = true;
-					scene[tempSceneKey].commands.Add(line);
-				} else if (choiceOpen) { //choices
-					Choice tempChoice = new Choice();
-					tempChoice.text = tempLine [0].Trim ();
-					tempChoice.destination = tempLine [1].Trim ();
-					scene [tempSceneKey].choices.Add (tempChoice);
-				} else { //other command
-					scene[tempSceneKey].commands.Add(line);
-				}
-			} else if (line.Trim() != ""){ //text dialog
-				scene[tempSceneKey].commands.Add(line);
-			}
-		}
-
-
-		/* Debugging
-		foreach (string x in scene["AwalMula"].commands) {
-			print (x);
-		}
-
-		foreach (Choice x in scene["AwalMula"].choices) {
-			print (x.text+"|"+x.destination);
-		}*/
-
-
-		//illustration
-		foreach (Sprite sprite in spriteIllustration) {
-			illustration.Add (sprite.name, sprite);
-		}
-
+		PlayerPrefs.DeleteAll ();
+		//resource
+		resources = GameObject.Find("Resources").GetComponent<Resources>();
+		//scenario resources
+		firstScene = resources.firstScene;
+		scene = resources.scene;
+		//illustration resources
+		illustration = resources.illustration;
+		//audio resources
+		BGM = resources.BGM;
+		SE = resources.SE;
+		//audio source
+		BGMaudioSource = this.GetComponent<AudioSource>();
+		SEaudioSource = this.gameObject.AddComponent<AudioSource> ();
 
 
 		//temp initialize
 		currentCommandIndex = -1; //-1 because currentCommandIndex++ run first
 		currentScene = firstScene;
+		currentBGM = "none";
 		inventory = new List<string>();
 
 
@@ -96,6 +79,36 @@ public class PlayStory : MonoBehaviour {
 		dialogText = GameObject.Find("DialogText").GetComponent<Text>();
 		illustrationImage = GameObject.Find("Illustration").GetComponent<Image>();
 		fadePanel = GameObject.Find("FadePanel").GetComponent<Image>();
+
+		//menu
+		confirmExit = GameObject.Find ("ConfirmExit");
+		confirmExit.SetActive (false);
+		menu = GameObject.Find ("Menu");
+		menu.SetActive (false);
+
+		//Save load slot
+		maxSlots = 1;
+		slot = new GameObject[maxSlots];
+		string tempSpriteName;
+		string tempText;
+		for (int i = 0; i < maxSlots; i++) {
+			slot [i] = GameObject.Find ("Slot" + (i + 1));
+			tempSpriteName = PlayerPrefs.GetString ("Slot" + (i + 1) + "Image", "none");
+			tempText = PlayerPrefs.GetString ("Slot" + (i + 1) + "Date", "Slot a" + (i + 1));
+			if (tempSpriteName!="none") {
+				slot [i].transform.Find ("Image").GetComponent<Image> ().sprite = illustration [tempSpriteName];
+			}
+			slot [i].transform.Find ("Text").GetComponent<Text> ().text = tempText;
+			//load text / date
+		}
+
+		//save load UI
+		confirmSaveLoad = GameObject.Find ("ConfirmSaveLoad");
+		confirmSaveLoad.SetActive (false);
+		saveLoad = GameObject.Find ("SaveLoadUI");
+		saveLoad.SetActive (false);
+		isSave = true;
+
 
 		//choice initialize
 		maxChoices = 6;
@@ -174,6 +187,18 @@ public class PlayStory : MonoBehaviour {
 					dialogText.transform.parent.gameObject.SetActive (false);
 				} else if (tempLine [0].Trim () == "image") {
 					StartCoroutine(IllustrationTransition(illustration [tempLine [1].Trim ()]));
+				} else if (tempLine [0].Trim () == "bgm") {
+					currentBGM = tempLine [1].Trim ();
+					if (tempLine [1].Trim () == "none") {
+						BGMaudioSource.Stop ();
+					} else {
+						BGMaudioSource.clip = BGM [currentBGM];
+						BGMaudioSource.Play ();
+					}
+					clickDialog ();
+				} else if (tempLine [0].Trim () == "se") {
+					SEaudioSource.PlayOneShot (SE[tempLine [1].Trim ()], 0.6f);
+					clickDialog ();
 				} else if (tempLine [0].Trim () == "jump") {
 					currentCommandIndex = -1;
 					currentScene = tempLine [1].Trim ();
@@ -228,5 +253,86 @@ public class PlayStory : MonoBehaviour {
 		dialogText.transform.parent.gameObject.SetActive (true);
 
 		clickDialog ();
+	}
+
+
+	public void clickOpenMenu(){
+		menu.SetActive (true);
+	}
+
+	public void clickCloseMenu(){
+		menu.SetActive (false);
+	}
+
+	public void clickExitMenu(){
+		confirmExit.SetActive (true);
+	}
+
+	public void clickExitYes(){
+		SceneManager.LoadScene (0);
+	}
+
+	public void clickExitNo(){
+		confirmExit.SetActive(false);
+	}
+
+	public void clickSaveMenu(){
+		isSave = true;
+		saveLoad.SetActive(true);
+	}
+
+	public void clickLoadMenu(){
+		isSave = false;
+		saveLoad.SetActive(true);
+	}
+
+	public void clickCloseSaveLoad(){
+		saveLoad.SetActive (false);
+	}
+
+
+
+	public void clickSlot(int slotNumber){
+		if (isSave) { //save
+			if (PlayerPrefs.GetString ("Slot" + slotNumber + "Date", "none") == "none") {
+				save (slotNumber);
+			} else {
+				currentSlot = slotNumber;
+				confirmSaveLoad.SetActive (true);
+				confirmSaveLoad.transform.Find("Text").GetComponent<Text>().text = "Overwrite this save data?";
+			}
+		} else { //load
+		}
+	}
+
+	private void save(int slotNumber){
+		string tempDate = System.DateTime.Now.ToString ("yyyy/MM/dd hh:mm:ss");
+		string tempSpriteName = illustrationImage.sprite.name;
+		PlayerPrefs.SetString ("Slot" + slotNumber + "Date", tempDate);
+		PlayerPrefs.SetString ("Slot" + slotNumber + "Image", tempSpriteName);
+
+		slot [slotNumber-1].transform.Find ("Image").GetComponent<Image> ().sprite = illustration [tempSpriteName];
+		slot [slotNumber-1].transform.Find ("Text").GetComponent<Text> ().text = tempDate;
+
+		PlayerPrefs.SetString ("Slot" + slotNumber + "Scene", currentScene);
+		PlayerPrefs.SetInt ("Slot" + slotNumber + "CommandIndex", currentCommandIndex-1);
+		PlayerPrefs.SetString ("Slot" + slotNumber + "BGM", currentBGM);
+		PlayerPrefs.SetString ("Slot" + slotNumber + "Inventory", string.Join (",", inventory.ToArray()));
+	}
+
+	private void load(int slotNumber){
+	}
+
+	public void clickConfirmSaveLoadYes(){
+		if (isSave) { //save
+			save (currentSlot);
+			confirmSaveLoad.SetActive (false);
+		} else { //load
+		}
+
+	}
+
+	public void clickConfirmSaveLoadNo(){
+		confirmSaveLoad.SetActive (false);
 	}
 }
