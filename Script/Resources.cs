@@ -18,6 +18,8 @@ public class Resources : MonoBehaviour {
 	public Dictionary<string, AudioClip> BGM = new Dictionary<string, AudioClip>();
 	public List<AudioClip> SEClip;
 	public Dictionary<string, AudioClip> SE = new Dictionary<string, AudioClip>();
+	//save load
+	public Sprite emptySlot;
 
 	void Awake(){
 		DontDestroyOnLoad (this.gameObject);

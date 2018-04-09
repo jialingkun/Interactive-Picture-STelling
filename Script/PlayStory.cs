@@ -21,6 +21,7 @@ public class PlayStory : MonoBehaviour {
 	private string firstScene;
 	private int currentCommandIndex;
 	private string currentScene;
+	private string currentImage;
 	private string[] tempLine;
 	private List<string> inventory;
 	//animate
@@ -52,7 +53,6 @@ public class PlayStory : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		PlayerPrefs.DeleteAll ();
 		//resource
 		resources = GameObject.Find("Resources").GetComponent<Resources>();
 		//scenario resources
@@ -67,14 +67,6 @@ public class PlayStory : MonoBehaviour {
 		BGMaudioSource = this.GetComponent<AudioSource>();
 		SEaudioSource = this.gameObject.AddComponent<AudioSource> ();
 
-
-		//temp initialize
-		currentCommandIndex = -1; //-1 because currentCommandIndex++ run first
-		currentScene = firstScene;
-		currentBGM = "none";
-		inventory = new List<string>();
-
-
 		//gameobject initialize
 		dialogText = GameObject.Find("DialogText").GetComponent<Text>();
 		illustrationImage = GameObject.Find("Illustration").GetComponent<Image>();
@@ -87,19 +79,20 @@ public class PlayStory : MonoBehaviour {
 		menu.SetActive (false);
 
 		//Save load slot
-		maxSlots = 1;
+		maxSlots = 6;
 		slot = new GameObject[maxSlots];
 		string tempSpriteName;
 		string tempText;
 		for (int i = 0; i < maxSlots; i++) {
 			slot [i] = GameObject.Find ("Slot" + (i + 1));
 			tempSpriteName = PlayerPrefs.GetString ("Slot" + (i + 1) + "Image", "none");
-			tempText = PlayerPrefs.GetString ("Slot" + (i + 1) + "Date", "Slot a" + (i + 1));
-			if (tempSpriteName!="none") {
+			tempText = PlayerPrefs.GetString ("Slot" + (i + 1) + "Date", "Slot " + (i + 1));
+			if (tempSpriteName == "none") {
+				slot [i].transform.Find ("Image").GetComponent<Image> ().sprite = resources.emptySlot;
+			} else {
 				slot [i].transform.Find ("Image").GetComponent<Image> ().sprite = illustration [tempSpriteName];
 			}
 			slot [i].transform.Find ("Text").GetComponent<Text> ().text = tempText;
-			//load text / date
 		}
 
 		//save load UI
@@ -117,6 +110,26 @@ public class PlayStory : MonoBehaviour {
 		for (int i = 0; i < maxChoices; i++) {
 			choiceText[i] = GameObject.Find("Choice"+(i+1)+"Text").GetComponent<Text>();
 			choiceText [i].transform.parent.gameObject.SetActive (false);
+		}
+
+		//LOAD
+		currentCommandIndex = PlayerPrefs.GetInt("LoadCommandIndex", -1);
+		currentScene = PlayerPrefs.GetString("LoadScene", firstScene);
+		string tempInventory = PlayerPrefs.GetString("LoadInventory", "").Trim();
+		if (tempInventory == "") {
+			inventory = new List<string> ();
+		} else {
+			inventory = new List<string> (tempInventory.Split(","[0]));
+		}
+		currentBGM = PlayerPrefs.GetString("LoadBGM", "none");
+		if (currentBGM!="none") {
+			BGMaudioSource.clip = BGM [currentBGM];
+			BGMaudioSource.Play ();
+		}
+		currentImage = PlayerPrefs.GetString("LoadImage", "none");
+		if (currentImage!="none") {
+			illustrationImage.sprite = illustration[currentImage];
+			fadePanel.CrossFadeAlpha(0.0f, 0.1f, false);
 		}
 
 
@@ -213,7 +226,7 @@ public class PlayStory : MonoBehaviour {
 					for (int i = 0; i < tempReq.Length; i++) {
 						reqExist = false;
 						for (int j = 0; j < inventory.Count; j++) {
-							if (tempReq[i].Trim() == inventory[j]) {
+							if (tempReq[i].Trim() == inventory[j].Trim()) {
 								reqExist = true;
 							}
 						}
@@ -302,6 +315,11 @@ public class PlayStory : MonoBehaviour {
 				confirmSaveLoad.transform.Find("Text").GetComponent<Text>().text = "Overwrite this save data?";
 			}
 		} else { //load
+			if (PlayerPrefs.GetString ("Slot" + slotNumber + "Date", "none") != "none"){
+				currentSlot = slotNumber;
+				confirmSaveLoad.SetActive (true);
+				confirmSaveLoad.transform.Find("Text").GetComponent<Text>().text = "Load this save data?";
+			}
 		}
 	}
 
@@ -316,11 +334,18 @@ public class PlayStory : MonoBehaviour {
 
 		PlayerPrefs.SetString ("Slot" + slotNumber + "Scene", currentScene);
 		PlayerPrefs.SetInt ("Slot" + slotNumber + "CommandIndex", currentCommandIndex-1);
-		PlayerPrefs.SetString ("Slot" + slotNumber + "BGM", currentBGM);
 		PlayerPrefs.SetString ("Slot" + slotNumber + "Inventory", string.Join (",", inventory.ToArray()));
+		PlayerPrefs.SetString ("Slot" + slotNumber + "BGM", currentBGM);
 	}
 
 	private void load(int slotNumber){
+		PlayerPrefs.SetString("LoadScene", PlayerPrefs.GetString ("Slot" + slotNumber + "Scene")); 
+		PlayerPrefs.SetInt("LoadCommandIndex", PlayerPrefs.GetInt ("Slot" + slotNumber + "CommandIndex"));
+		PlayerPrefs.SetString("LoadInventory",PlayerPrefs.GetString ("Slot" + slotNumber + "Inventory"));
+		PlayerPrefs.SetString("LoadBGM",PlayerPrefs.GetString ("Slot" + slotNumber + "BGM"));
+		PlayerPrefs.SetString("LoadImage",PlayerPrefs.GetString ("Slot" + slotNumber + "Image"));
+
+		SceneManager.LoadScene (1);
 	}
 
 	public void clickConfirmSaveLoadYes(){
@@ -328,6 +353,7 @@ public class PlayStory : MonoBehaviour {
 			save (currentSlot);
 			confirmSaveLoad.SetActive (false);
 		} else { //load
+			load(currentSlot);
 		}
 
 	}
