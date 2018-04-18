@@ -4,36 +4,6 @@ There are three type of function in this editor:
 3. Choices
 
 
-Example
-------------
-scene: Scene0
-image: plane
-bgm: japanese
-Timun Emas
-Pada jaman dahulu kala di kerajaan indomie, hiduplah timun yang berbuah manusia. Seorang nenek menemukan timun dan bermaksud memasaknya, namun muncul anak bayi yang kelihatan enak.
-Karena anak bayi tu sangat lucu dan lezat, nenek bingung dan meletakkannya di bawah pohon.
-image: wood
-"Apa yang harus kulakukan pada anak ini?" gumam nenek kebingungan.
-choices:
-ambil anak itu dan dimasak: sceneA
-Buang ke panti: sceneB
-
-scene: sceneA
-bgm: pambiental
-Nenek itu pun membawa anak itu ke dapur dan mulai bersiap memasaknya.
-Sebelum nenek itu sempat memasukan si bayi ke dalam panci penggorengan, FBI datang dan mencoba menangkap nenek itu.
-Nenek itu berusaha kabur dengan cara melompat keluar jendela.
-se: deathexplode
-DOR!
-Kaki nenek di tembak. Dia kemudian diringkus FBI. 
-image: plane
-Sang nenek akhirnya masuk penjara dengan vonis percobaan kanibalisme.
-TAMAT
-AKHIR YANG BURUK - NENEK DIPENJARA
-gameover
--------------
-
-
 
 
 DIALOG
@@ -44,9 +14,6 @@ Karena anak bayi tu sangat lucu dan lezat, nenek bingung dan meletakkannya di ba
 "Apa yang harus kulakukan pada anak ini?" gumam nenek kebingungan.
 ------------
 Write anything you want and it will turn into text in dialog box. Every line break will replace the previous text with current line.
-
-
-
 
 
 
@@ -63,7 +30,7 @@ It execute specific function like change image background, change BGM etc
 
 
 
-LIST OF COMMANDS
+LIST OF COMMAND
 ------------
 Scene: scene name
 Declare the name of scene.
@@ -72,11 +39,11 @@ image: image file name
 Load image by image name
 
 bgm: audio file name
-Load BGM
+Load BGM by audio file name
 write "bgm: none" to stop BGM
 
 se: audio file name
-load SE
+load SE by audio file name
 
 jump: scene name
 Jump to specific scene
@@ -85,8 +52,8 @@ get: item name
 get item. The item will be used in conditional scenario using command "req"
 
 req: item name : destination scene when true : destination scene when false
-or
-req: item name 1, item name 2, item name n : destination scene when true : destination scene when false
+You can also use multiple items as condition,
+req: item name 1, item name 2, item name 3 : destination scene when true : destination scene when false
 conditional function to jump to certain scene when all required item collected.
 ------------
 
@@ -97,11 +64,10 @@ conditional function to jump to certain scene when all required item collected.
 CHOICES
 ------------
 choices:
-ambil anak itu dan dimasak: Jahat
-Buang ke panti: KurangJahat
+ambil anak itu dan dimasak: Mau Dimasak
+Buang ke panti: Mau dibawa panti
 ------------
 write "choices:" to indicate that program will enter choices function.
 The you can write the choices, using this format,
 choices text : destination scene
-destination scene contain the scene code declared by command "scene:". The game will jump to the specific destination scene when user pick this choice. Currently, maximum number of choices is 6 and minimum is 2.
-
+destination scene contain the scene name declared by command "scene:". The game will jump to the specific destination scene when user pick this choice. Maximum number of choices is 6 and minimum is 2.
